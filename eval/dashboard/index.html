@@ -11,12 +11,12 @@
     --baseline: #c3c2b7;
     --border: rgba(11, 11, 11, 0.10);
 
-    --series-1: #2a78d6; /* 质量 pass@1 */
-    --series-2: #1baf7a; /* 效率 (成本) */
-    --series-3: #eda100; /* 延迟 */
-    --series-4: #008300; /* 安全 */
-    --series-5: #4a3aa7; /* 可靠性 pass^k */
-    --series-6: #e34948; /* 业务 KPI */
+    --series-1: #2a78d6; /* 延迟 */
+    --series-2: #1baf7a; /* 成功 / token */
+    --series-3: #eda100;
+    --series-4: #008300;
+    --series-5: #4a3aa7;
+    --series-6: #e34948;
 
     --status-good: #0ca30c;
     --status-warning: #fab219;
@@ -133,15 +133,56 @@
     border-radius: 5px;
     padding: 3px 8px;
   }
+  header.top .top-left { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+  header.top h1 .plat-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    vertical-align: middle;
+    color: var(--series-3);
+    background: color-mix(in srgb, var(--series-3) 15%, transparent);
+    border-radius: 5px;
+    padding: 2px 7px;
+    margin-left: 9px;
+  }
+  header.top h1 .src-more { font-size: 12.5px; font-weight: 400; color: var(--text-muted); margin-left: 9px; }
+  header.top h1 .eval-target { color: var(--text-primary); }
 
-  /* ---------- sample data banner ---------- */
+  /* ---------- current eval target (agent under test) ---------- */
+  .agent-id {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 9px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+  }
+  .agent-id .ai-label {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .agent-id .ai-model {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-primary);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 9px;
+  }
+  .agent-id .ai-sep { color: var(--baseline); }
+  .agent-id .ai-extra { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+  .agent-id .ai-meta { color: var(--text-muted); }
+
+  /* ---------- info banner ---------- */
   .banner {
     display: flex;
     align-items: flex-start;
     gap: 10px;
     background: var(--surface-2);
     border: 1px solid var(--border);
-    border-left: 3px solid var(--status-warning);
+    border-left: 3px solid var(--series-2);
     border-radius: 8px;
     padding: 11px 14px;
     font-size: 12.5px;
@@ -153,51 +194,11 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--status-warning);
+    background: var(--series-2);
     margin-top: 6px;
   }
   .banner strong { color: var(--text-primary); font-weight: 600; }
-
-  /* ---------- filter row ---------- */
-  .filters {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    flex-wrap: wrap;
-  }
-  .filter-group { display: flex; align-items: center; gap: 6px; }
-  .filter-group .fname {
-    font-size: 12px; color: var(--text-muted); margin-right: 2px;
-  }
-  .seg {
-    display: inline-flex;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 2px;
-    gap: 2px;
-  }
-  .seg button {
-    appearance: none;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    font: inherit;
-    font-family: var(--sans);
-    font-size: 12.5px;
-    padding: 5px 11px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .seg button:hover { background: rgba(11,11,11,0.04); }
-  :root[data-theme="dark"] .seg button:hover,
-  @media (prefers-color-scheme: dark) { .seg button:hover { background: rgba(255,255,255,0.06); } }
-  .seg button.active {
-    background: var(--surface-1);
-    color: var(--text-primary);
-    font-weight: 600;
-    box-shadow: 0 1px 0 var(--border);
-  }
+  .banner code { font-family: var(--mono); }
 
   /* ---------- stat tiles ---------- */
   .tiles {
@@ -229,15 +230,7 @@
     font-weight: 650;
     letter-spacing: -0.02em;
   }
-  .tile .delta {
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 1px 6px;
-    border-radius: 4px;
-  }
-  .tile .delta.up { color: var(--status-good); background: color-mix(in srgb, var(--status-good) 14%, transparent); }
-  .tile .delta.down { color: var(--status-critical); background: color-mix(in srgb, var(--status-critical) 14%, transparent); }
+  .tile .unit { font-size: 13px; color: var(--text-muted); font-weight: 500; }
   .tile .spark { height: 26px; margin-top: 2px; }
   .tile .spark path.spark-line { fill: none; stroke-width: 1.6; }
   .tile .spark path.spark-fill { stroke: none; opacity: 0.12; }
@@ -247,14 +240,14 @@
     background: var(--surface-1);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 18px 18px 10px;
+    padding: 18px 18px 12px;
   }
   .card .card-head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
   }
   .card h2 {
     font-size: 14px;
@@ -271,19 +264,11 @@
     grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
-
-  /* ---------- legend ---------- */
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px 16px;
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
+  .row-3 {
+    display: grid;
+    grid-template-columns: 0.9fr 1fr 1fr;
+    gap: 16px;
   }
-  .legend .item { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
-  .legend .item.dim { opacity: 0.35; }
-  .legend .swatch { width: 14px; height: 2px; border-radius: 1px; }
 
   /* ---------- svg chart internals ---------- */
   svg.chart { display: block; width: 100%; overflow: visible; }
@@ -328,6 +313,68 @@
   .tooltip .t-val { font-family: var(--mono); font-weight: 700; color: var(--text-primary); }
 
   .chart-wrap { position: relative; }
+  .chart-empty {
+    color: var(--text-muted);
+    font-size: 12px;
+    padding: 30px 4px;
+    text-align: center;
+  }
+
+  /* ---------- harness six-principle radar ---------- */
+  .harness-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: center; }
+  @media (max-width: 860px) { .harness-grid { grid-template-columns: 1fr; } }
+  .radar-wrap { display: flex; justify-content: center; }
+  svg.radar { width: 100%; max-width: 340px; height: auto; overflow: visible; }
+  .radar .r-grid { fill: none; stroke: var(--gridline); stroke-width: 1; }
+  .radar .r-spoke { stroke: var(--gridline); stroke-width: 1; }
+  .radar .r-area { fill: var(--series-1); fill-opacity: 0.16; stroke: var(--series-1); stroke-width: 2; stroke-linejoin: round; }
+  .radar .r-vertex { stroke: var(--surface-1); stroke-width: 1.5; }
+  .radar .r-axis-name { font-size: 11px; font-weight: 600; fill: var(--text-secondary); }
+  .radar .r-axis-frac { font-size: 10px; font-family: var(--mono); fill: var(--text-muted); }
+
+  .hx-list { display: flex; flex-direction: column; gap: 11px; }
+  .hx-row { display: grid; grid-template-columns: auto 1fr auto; gap: 10px 12px; align-items: start; }
+  .hx-badge {
+    width: 22px; height: 22px; border-radius: 6px; flex: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 12px; font-weight: 700;
+  }
+  .hx-main { min-width: 0; }
+  .hx-name { font-size: 13px; font-weight: 650; }
+  .hx-name .en { font-weight: 400; color: var(--text-muted); font-size: 11px; margin-left: 6px; }
+  .hx-def { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; margin-top: 1px; }
+  .hx-track { height: 5px; border-radius: 3px; background: var(--surface-2); margin-top: 7px; overflow: hidden; }
+  .hx-fill { height: 100%; border-radius: 3px; }
+  .hx-frac { font-family: var(--mono); font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+  .hx-frac .sub { color: var(--text-muted); font-weight: 500; font-size: 11px; }
+
+  /* ---------- donut (status) ---------- */
+  .donut-wrap { display: flex; align-items: center; gap: 18px; padding: 4px 0 8px; }
+  .donut { position: relative; flex: none; width: 132px; height: 132px; }
+  .donut svg { width: 132px; height: 132px; transform: rotate(-90deg); }
+  .donut .donut-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1px;
+  }
+  .donut .donut-pct { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; }
+  .donut .donut-cap { font-size: 11px; color: var(--text-muted); }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+  .donut-legend .item { display: flex; align-items: center; gap: 8px; }
+  .donut-legend .sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+  .donut-legend .lg-name { color: var(--text-secondary); }
+  .donut-legend .lg-val { font-family: var(--mono); font-weight: 700; margin-left: auto; }
+
+  /* ---------- horizontal bar lists ---------- */
+  .barlist { display: flex; flex-direction: column; gap: 10px; padding: 4px 0 8px; }
+  .bar-row { display: grid; grid-template-columns: minmax(90px, 42%) 1fr auto; align-items: center; gap: 10px; }
+  .bar-label {
+    font-family: var(--mono); font-size: 11.5px; color: var(--text-secondary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .bar-track { height: 16px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; min-width: 2px; }
+  .bar-val { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--text-primary); }
 
   /* ---------- real run log table ---------- */
   .run-table-wrap { overflow-x: auto; }
@@ -382,91 +429,35 @@
     padding-top: 6px;
     border-top: 1px solid var(--border);
   }
+  footer.note code { font-family: var(--mono); }
 
+  @media (max-width: 980px) {
+    .row-3 { grid-template-columns: 1fr; }
+  }
   @media (max-width: 860px) {
     .tiles { grid-template-columns: repeat(2, 1fr); }
     .row-2 { grid-template-columns: 1fr; }
-    .dim-grid { grid-template-columns: 1fr !important; }
   }
-
-  /* ---------- six-dimension small multiples ---------- */
-  .dim-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-  }
-  @media (max-width: 1080px) {
-    .dim-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  .dim-cell {
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 12px 14px 6px;
-  }
-  .dim-cell .dim-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-  .dim-cell .dim-name {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-  }
-  .dim-cell .dim-value {
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 700;
-  }
-  .dim-cell .dim-delta {
-    font-family: var(--mono);
-    font-size: 11px;
-    font-weight: 600;
-    margin-left: 4px;
-  }
-  .dim-cell .dim-delta.up { color: var(--status-good); }
-  .dim-cell .dim-delta.down { color: var(--status-critical); }
 </style>
 
 <div class="wrap">
   <header class="top">
-    <div>
-      <h1>评估看板 — 通用 Agent</h1>
-      <div class="sub">Loop Engineering · 数据飞轮趋势总览</div>
+    <div class="top-left">
+      <h1 id="evalTitle">评估看板</h1>
+      <div class="agent-id" id="agentId"></div>
     </div>
-    <div class="buildtag">eval-charter · phase 5 preview</div>
+    <div class="buildtag" id="buildTag">live · trace-driven</div>
   </header>
 
   <div class="banner">
     <span class="dot"></span>
     <div>
-      <strong>当前展示的是示例数据，不是真实评测结果。</strong>
-      黄金数据集（Phase 2）、grader（Phase 3）、runner（Phase 4）都还没有正式跑起来，
-      这里先把 Phase 5 的看板结构和交互搭出来——图里的线条形状是为了演示"进步中带一次可靠性回落"
-      这类真实场景而手工构造的，等 <code style="font-family:var(--mono)">eval/reports/</code>
-      下有了真实的多版本运行记录，只需要把下面 <code style="font-family:var(--mono)">SAMPLE_DATA</code>
-      换成真实数据源即可，页面结构不用改。
-    </div>
-  </div>
-
-  <div class="filters">
-    <div class="filter-group">
-      <span class="fname">数据切分</span>
-      <div class="seg" id="splitSeg">
-        <button data-split="dev" class="active">dev</button>
-        <button data-split="heldout">held-out</button>
-      </div>
-    </div>
-    <div class="filter-group">
-      <span class="fname">版本范围</span>
-      <div class="seg" id="rangeSeg">
-        <button data-range="all" class="active">全部</button>
-        <button data-range="last4">近 4 个版本</button>
-        <button data-range="last2">近 2 个版本</button>
-      </div>
+      <strong>本页全部为真实数据，无任何手工构造的示例数据。</strong>
+      两类来源，均由 <code>python eval/dashboard/build.py</code> 注入：
+      <strong>①「六维 harness 原则达成度」</strong>核对本 agent 是否按 AI 系統工程六項設計原則
+      （上下文管理 / 工具调用 / 执行编排 / 状态与记忆 / 评估与观测 / 约束与恢复）落地，
+      数据来自 <code>eval/harness-checklist.md</code>；<strong>②「调用侧可观测指标」</strong>
+      （延迟 / token / 成功率 / 工具与来源分布）来自 <code>eval/runner/trace_store/</code> 的真实运行记录。
     </div>
   </div>
 
@@ -475,43 +466,94 @@
   <section class="card">
     <div class="card-head">
       <div>
-        <h2>六维指标趋势</h2>
+        <h2>六维 harness 原则达成度</h2>
         <p class="card-sub">
-          每个维度用自己的单位和坐标轴单独画——之前用"归一化到同一张图"的方式，
-          安全这类本来就在 90-97% 窄幅波动的指标会被可靠性这种大幅波动的指标
-          压扁到几乎看不见，等于有一项指标"没显示"。改成小图矩阵后每个维度
-          都有自己合适的縦轴刻度，鼠标悬停看具体版本的数值。
+          按《酒店 AI 轉型落地框架》的 AI 系統工程六項設計原則，逐条核对本 agent 的实现现状——
+          每一维的分值 = 已落实项 / 该维总检查项，数据来自 <code style="font-family:var(--mono)">eval/harness-checklist.md</code>。
+          鼠标悬停某一维可看该维的逐条明细。
         </p>
       </div>
+      <div class="buildtag" id="harnessOverall">—</div>
     </div>
-    <div class="dim-grid" id="dimGrid"></div>
+    <div class="harness-grid" id="harnessGrid">
+      <div class="radar-wrap">
+        <svg class="radar" id="harnessRadar" viewBox="0 0 340 300"></svg>
+      </div>
+      <div class="hx-list" id="harnessList"></div>
+    </div>
+    <div class="chart-empty" id="harnessEmpty" style="display:none;">
+      读不到 harness-checklist.md 的六维数据——检查 eval/harness-checklist.md 是否存在、格式是否被改动。
+    </div>
   </section>
 
   <div class="row-2">
     <section class="card">
       <div class="card-head">
         <div>
-          <h2>Bad case 数量趋势</h2>
-          <p class="card-sub">每轮错误分析后新增的回归用例数</p>
+          <h2>延迟趋势</h2>
+          <p class="card-sub">每一次真实调用的端到端耗时（秒），按时间先后排列</p>
         </div>
       </div>
       <div class="chart-wrap">
-        <svg class="chart" id="badcaseChart" viewBox="0 0 520 220"></svg>
-        <div class="tooltip" id="badcaseTooltip"></div>
+        <svg class="chart" id="latencyChart" viewBox="0 0 520 220"></svg>
+        <div class="tooltip" id="latencyTooltip"></div>
+        <div class="chart-empty" id="latencyEmpty" style="display:none;">还没有运行记录</div>
       </div>
     </section>
 
     <section class="card">
       <div class="card-head">
         <div>
-          <h2>数据集规模增长</h2>
-          <p class="card-sub">黄金数据集条数，体现数据飞轮</p>
+          <h2>Token 用量趋势</h2>
+          <p class="card-sub">单次调用的总 token，仅含已采集到 usage 的记录</p>
         </div>
       </div>
       <div class="chart-wrap">
-        <svg class="chart" id="datasetChart" viewBox="0 0 520 220"></svg>
-        <div class="tooltip" id="datasetTooltip"></div>
+        <svg class="chart" id="tokenChart" viewBox="0 0 520 220"></svg>
+        <div class="tooltip" id="tokenTooltip"></div>
+        <div class="chart-empty" id="tokenEmpty" style="display:none;">暂无带 token 用量的记录（早期调用未采集）</div>
       </div>
+    </section>
+  </div>
+
+  <div class="row-3">
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>调用状态分布</h2>
+          <p class="card-sub">成功 vs 出错</p>
+        </div>
+      </div>
+      <div class="donut-wrap">
+        <div class="donut">
+          <svg viewBox="0 0 42 42" id="statusDonut"></svg>
+          <div class="donut-center">
+            <div class="donut-pct" id="statusPct">—</div>
+            <div class="donut-cap">成功率</div>
+          </div>
+        </div>
+        <div class="donut-legend" id="statusLegend"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>工具使用分布</h2>
+          <p class="card-sub">各工具被调用的次数</p>
+        </div>
+      </div>
+      <div class="barlist" id="toolBars"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>调用来源分布</h2>
+          <p class="card-sub">按 resolve_source 反推的触发方</p>
+        </div>
+      </div>
+      <div class="barlist" id="sourceBars"></div>
     </section>
   </div>
 
@@ -520,10 +562,8 @@
       <div>
         <h2>真实运行记录</h2>
         <p class="card-sub">
-          来自 <code style="font-family:var(--mono)">eval/runner/trace_store/</code> 的实际调用——
-          本地手动跑的、smoke_test.py 跑的、OpenClaw 真实触发的，都会落在这里。
-          这是目前唯一一段<strong style="color:var(--text-primary)">真实数据</strong>，
-          不是上面六维图那种示例数据。
+          来自 <code style="font-family:var(--mono)">eval/runner/trace_store/</code> 的实际调用明细，
+          按时间倒序。上面所有图表都是从这张表的数据聚合出来的。
         </p>
       </div>
     </div>
@@ -546,17 +586,19 @@
       </table>
       <div class="empty-state" id="runTableEmpty" style="display:none;">
         还没有真实运行记录——跑一次 <code style="font-family:var(--mono)">scripts/openclaw_cli.py</code>
-        或者让 OpenClaw 调用一次咱们的 skill，这里就会出现数据。
+        或者让 OpenClaw 调用一次咱们的 skill，再执行 <code style="font-family:var(--mono)">python eval/dashboard/build.py</code>，这里就会出现数据。
       </div>
     </div>
   </section>
 
   <footer class="note">
-    看板会随 <code style="font-family:var(--mono)">--split</code> 参数区分 dev / held-out ——
-    按评估计划的隔离规则，版本判定只看 held-out 上的结果，dev 集上的提升不作为改进结论。
-    六维分别是：质量（pass@1）、效率（单次成本）、延迟（P50）、安全、可靠性（pass^5）、业务 KPI。
-    "真实运行记录" 这张表格是唯一的真实数据来源；每次运行 <code style="font-family:var(--mono)">python eval/dashboard/build.py</code>
-    会重新扫描 <code style="font-family:var(--mono)">trace_store/</code> 并把最新记录写回这个文件。
+    这份看板只呈现<strong style="color:var(--text-primary)">真实数据</strong>，两个来源都由
+    <code style="font-family:var(--mono)">python eval/dashboard/build.py</code> 注入，改动后重跑即可刷新：
+    「六维 harness 原则达成度」解析 <code style="font-family:var(--mono)">eval/harness-checklist.md</code>
+    的 <code style="font-family:var(--mono)">[x]/[ ]</code> 勾选状态——每次改动 agent 核心逻辑后过一遍那份清单、更新勾选，
+    这里的达成度就会跟着变；「调用侧指标」聚合 <code style="font-family:var(--mono)">eval/runner/trace_store/</code>
+    的运行记录。六维评测衡量的是 agent 有没有按 harness engineering 六项原则落地，
+    <strong style="color:var(--text-primary)">不是</strong> pass@1／成本那类模型效果评分——后者要等黄金数据集与 grader（Phase 2–4）跑通后另行接入。
   </footer>
 </div>
 
@@ -565,89 +607,259 @@
   "use strict";
 
   // ---------------------------------------------------------------------
-  // 示例数据 —— 等 eval/reports/ 下有真实的多版本运行记录后，
-  // 把这里换成从真实报告读取的数据即可，下面所有渲染逻辑不用改。
-  // ---------------------------------------------------------------------
-  const VERSIONS = ["v0.1", "v0.2", "v0.3", "v0.4", "v0.5", "v0.6"];
-
-  const DIMENSIONS = [
-    { key: "quality",     name: "质量 (pass@1)",   unit: "%",   color: "var(--series-1)" },
-    { key: "cost",        name: "效率 (成本/次)",  unit: "$",   color: "var(--series-2)", lowerIsBetter: true },
-    { key: "latency",     name: "延迟 (P50)",      unit: "s",   color: "var(--series-3)", lowerIsBetter: true },
-    { key: "safety",      name: "安全",            unit: "%",   color: "var(--series-4)" },
-    { key: "reliability", name: "可靠性 (pass^5)", unit: "%",   color: "var(--series-5)" },
-    { key: "kpi",         name: "业务 KPI",        unit: "%",   color: "var(--series-6)" },
-  ];
-
-  const SAMPLE_DATA = {
-    dev: {
-      quality:     [58, 62, 67, 71, 76, 81],
-      cost:        [0.42, 0.39, 0.35, 0.33, 0.29, 0.26],
-      latency:     [8.4, 7.9, 7.1, 6.6, 6.0, 5.4],
-      safety:      [91, 92, 94, 95, 96, 97],
-      reliability: [40, 48, 52, 58, 65, 70],
-      kpi:         [61, 64, 69, 73, 78, 83],
-      badcases:    [18, 15, 17, 12, 9, 6],
-      dataset:     [24, 31, 38, 45, 52, 58],
-    },
-    heldout: {
-      quality:     [55, 59, 63, 66, 70, 74],
-      cost:        [0.45, 0.41, 0.38, 0.35, 0.32, 0.29],
-      latency:     [9.1, 8.5, 7.8, 7.2, 6.6, 6.1],
-      safety:      [89, 90, 92, 93, 95, 96],
-      reliability: [35, 42, 44, 41, 55, 60], // v0.4 出现一次可靠性回落
-      kpi:         [58, 60, 64, 67, 72, 76],
-      badcases:    [21, 18, 20, 16, 11, 8],
-      dataset:     [10, 13, 15, 18, 20, 23],
-    },
-  };
-
-  // ---------------------------------------------------------------------
   // 真实运行记录 —— 由 eval/dashboard/build.py 扫描 eval/runner/trace_store/
-  // 生成，替换掉下面这个数组。这是页面里唯一的真实数据来源，跟上面的
-  // SAMPLE_DATA 是两回事，不要混着改。
+  // 注入。这是页面里唯一的数据来源，下面所有图表都从它聚合，不存在任何
+  // 手工构造的示例数据。
   // ---------------------------------------------------------------------
   const REAL_RUNS = /*REAL_RUNS_JSON_START*/[{"trial_id": "e481e6eb-5af5-4276-b01b-2113ad981010", "timestamp": "2026-07-21T18:37:26.685416+00:00", "user_input": "帮我算一下 45 乘以 67 是多少", "final_answer": "45 × 67 = **3015**", "error": null, "model": "minimax:MiniMax-M3", "tools_used": [], "latency_seconds": 4.935940742492676, "source": null, "token_usage": {}, "retry_count": 0}, {"trial_id": "f620994d-bbbd-47ac-bc1a-1c82d5f9834a", "timestamp": "2026-07-21T18:37:52.075837+00:00", "user_input": "帮我搜索一下 LangChain 是什么，一句话总结", "final_answer": "LangChain 是一个用于构建大语言模型（LLM）应用的开发框架，通过将 LLM 与外部数据源、工具和记忆模块链接（Chain）起来，方便开发者快速搭建如问答、对话、Agent 等 AI 应用。", "error": null, "model": "minimax:MiniMax-M3", "tools_used": [], "latency_seconds": 4.558582067489624, "source": null, "token_usage": {}, "retry_count": 0}, {"trial_id": "dcd4a7da-0142-4932-83e3-3f486ffd6b15", "timestamp": "2026-07-21T18:38:39.905685+00:00", "user_input": "用代码执行工具算一下 1 到 50 的和", "final_answer": "1 到 50 的和是 **1275**。", "error": null, "model": "default", "tools_used": ["execute_python_code"], "latency_seconds": 8.930422067642212, "source": null, "token_usage": {}, "retry_count": 0}, {"trial_id": "5f78a16a-78ff-4637-b719-c38996ec9592", "timestamp": "2026-07-21T18:51:46.195703+00:00", "user_input": "帮我算一下 3 乘以 3 是多少", "final_answer": "3 乘以 3 等于 **9**。", "error": null, "model": "default", "tools_used": [], "latency_seconds": 4.755987882614136, "source": "本地直接调用", "token_usage": {"input_tokens": 505, "output_tokens": 16, "total_tokens": 521}, "retry_count": 0}, {"trial_id": "620640f2-8333-4d18-807a-e7cc385b2a32", "timestamp": "2026-07-21T18:52:33.030944+00:00", "user_input": "帮我算一下 8 的阶乘", "final_answer": "8 的阶乘是：\n\n**8! = 8 × 7 × 6 × 5 × 4 × 3 × 2 × 1 = 40320**", "error": null, "model": "default", "tools_used": [], "latency_seconds": 5.852184057235718, "source": "openclaw:openclaw-business-analysis", "token_usage": {"input_tokens": 501, "output_tokens": 42, "total_tokens": 543}, "retry_count": 0}, {"trial_id": "d161ceb6-1514-48a8-8a23-779c4dd924e8", "timestamp": "2026-07-21T19:11:29.133691+00:00", "user_input": "帮我记住这个数字：42", "final_answer": "好的，我在这个对话里记住了数字 **42** ✅\n\n不过有一点需要说明：我没有跨对话的持久记忆能力，所以：\n\n- ✅ 在**当前这次对话**中，我可以随时引用它。\n- ❌ 当这次对话结束后，下次再开启新对话时，我就不会记得了。\n\n如果你希望长期保存它，建议：\n- 记在手机备忘录 / 笔记 App 里\n- 设置一个提醒\n- 或者告诉我你希望用这个数字做什么，我可以帮你处理\n\n需要我帮你做点别的吗？", "error": null, "model": "minimax:MiniMax-M3", "tools_used": [], "latency_seconds": 9.605639934539795, "source": "本地直接调用", "token_usage": {"input_tokens": 904, "output_tokens": 217, "total_tokens": 1121}, "retry_count": 0}, {"trial_id": "12d1b221-6552-4d74-95d5-ff0be3f260d0", "timestamp": "2026-07-21T19:11:51.166915+00:00", "user_input": "我刚才让你记住的数字是多少？直接告诉我数字。", "final_answer": "42", "error": null, "model": "minimax:MiniMax-M3", "tools_used": [], "latency_seconds": 8.947804927825928, "source": "本地直接调用", "token_usage": {"input_tokens": 1141, "output_tokens": 37, "total_tokens": 1178}, "retry_count": 0}]/*REAL_RUNS_JSON_END*/;
 
-  let state = { split: "dev", range: "all" };
+  // 六维 harness 原则达成度 —— 由 build.py 解析 eval/harness-checklist.md 注入。
+  // 每维：{id, name, en, definition, done, total, items:[{done,text}]}
+  const HARNESS_DIMS = /*HARNESS_DIMS_JSON_START*/[{"id": "①", "name": "上下文管理", "en": "Context Management", "definition": "确保 AI 决策时掌握完整业务背景，避免信息缺失导致误判。", "done": 1, "total": 3, "items": [{"done": true, "text": "token 用量追踪（input/output/total，TracingMiddleware 从"}, {"done": false, "text": "业务背景注入——agent 目前不知道\"自己是谁的助手、服务什么场景\"，"}, {"done": false, "text": "长对话的上下文压缩/超限保护——对话变长后没有自动摘要或裁剪"}]}, {"id": "②", "name": "工具调用", "en": "Tools Integration", "definition": "通过 API 打通各系统，使 AI 具备实际执行能力。", "done": 2, "total": 5, "items": [{"done": true, "text": "网络搜索（Brave Search，真实可用）"}, {"done": true, "text": "代码执行（自建 Docker 沙箱，真实可用，网络隔离）"}, {"done": false, "text": "内部数据检索——占位实现（agent/tools/internal_retrieval.py）"}, {"done": false, "text": "第三方业务 API——占位实现（agent/tools/third_party_api.py）"}, {"done": false, "text": "工具级成功/失败结构化标记——目前只能从 ToolMessage 的文本内容里"}]}, {"id": "③", "name": "执行编排", "en": "Orchestration", "definition": "多个 AI 任务协同运作，跨部门业务联动响应。", "done": 1, "total": 3, "items": [{"done": true, "text": "单 agent 内的多轮工具调用循环（LangGraph create_agent 状态图）"}, {"done": false, "text": "多 agent/多任务协同——目前是单体架构，没有\"多个 agent 分工、"}, {"done": false, "text": "显式的\"这次跑了几轮工具调用\"指标，目前只能从 trace_events 里"}]}, {"id": "④", "name": "状态与记忆", "en": "State & Memory", "definition": "宾客偏好与营运知识分层沉淀，服务具备连贯性。", "done": 1, "total": 3, "items": [{"done": true, "text": "跨调用的对话记忆（本轮加上）——agent/agent.py 的"}, {"done": false, "text": "长期知识沉淀（比如学到的偏好、纠正过的错误）——目前只有\"这次"}, {"done": false, "text": "记忆的检索/清理策略——sqlite 文件会无限增长，没有过期/裁剪机制"}]}, {"id": "⑤", "name": "评估与观测", "en": "Evaluation & Observability", "definition": "以量化指标持续监测 AI 效果，向管理层透明汇报。", "done": 1, "total": 2, "items": [{"done": true, "text": "观测的一半：真实运行记录（eval/dashboard/ 的\"真实运行记录\"表，"}, {"done": false, "text": "量化的一半：真正的评分/评测逻辑——六维图目前是示例数据，"}]}, {"id": "⑥", "name": "约束与恢复", "en": "Constraints & Recovery", "definition": "设定安全边界与人工审核门槛，异常时自动回退，保障营运。", "done": 1, "total": 3, "items": [{"done": true, "text": "失败重试（本轮加上）——core.py 的 run_agent() 现在对"}, {"done": false, "text": "人工审核门槛——没有任何\"高风险操作需要人确认\"的机制（目前四个"}, {"done": false, "text": "迭代次数/资源上限的显式约束——目前依赖 LangGraph 自身的默认"}]}]/*HARNESS_DIMS_JSON_END*/;
+
+  // 当前评估对象 —— 由 build.py 从 agent/config.py 的 DEFAULT_MODEL + trace 里
+  // 实际跑过的模型汇总注入。{default_model, models_seen[], run_count, last_run}
+  const AGENT_INFO = /*AGENT_INFO_JSON_START*/{"default_model": "minimax:MiniMax-M3", "models_seen": ["minimax:MiniMax-M3"], "run_count": 7, "last_run": "2026-07-21T19:11:51.166915+00:00", "sources": [{"count": 6, "source": "本地直接调用", "platform": "local", "agent": "本地直接调用", "label": "本地直接调用"}, {"count": 1, "source": "openclaw:openclaw-business-analysis", "platform": "openclaw", "agent": "openclaw-business-analysis", "label": "openclaw-business-analysis"}], "source_count": 2, "primary": {"count": 1, "source": "openclaw:openclaw-business-analysis", "platform": "openclaw", "agent": "openclaw-business-analysis", "label": "openclaw-business-analysis"}}/*AGENT_INFO_JSON_END*/;
 
   const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  const fmt = (v, unit) => {
-    if (unit === "$") return "$" + v.toFixed(2);
-    if (unit === "s") return v.toFixed(1) + "s";
-    if (unit === "%") return v.toFixed(0) + "%";
-    return String(v);
-  };
+  const resolveVar = (c) => (c && c.startsWith("var("))
+    ? css(c.slice(4, -1).trim())
+    : c;
 
-  function sliceRange(arr) {
-    if (state.range === "last4") return arr.slice(-4);
-    if (state.range === "last2") return arr.slice(-2);
-    return arr.slice();
+  // 按时间正序排列的运行记录（图表的 x 轴需要时间先后）
+  const runsAsc = REAL_RUNS.slice().sort((a, b) => (a.timestamp || "").localeCompare(b.timestamp || ""));
+
+  function shortTime(iso) {
+    try {
+      const d = new Date(iso);
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    } catch { return "—"; }
+  }
+  function fullTime(iso) {
+    try {
+      const d = new Date(iso);
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    } catch { return iso || "—"; }
+  }
+  const num = (v) => (typeof v === "number" && isFinite(v)) ? v : null;
+  const sourceLabel = (s) => s || "本地直接调用";
+
+  function median(arr) {
+    if (!arr.length) return null;
+    const s = arr.slice().sort((a, b) => a - b);
+    const mid = Math.floor(s.length / 2);
+    return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
   }
 
-  function currentData() {
-    const d = SAMPLE_DATA[state.split];
-    const versions = sliceRange(VERSIONS);
-    const n = versions.length;
-    const start = VERSIONS.length - n;
-    const pick = (arr) => arr.slice(start);
-    return {
-      versions,
-      quality: pick(d.quality),
-      cost: pick(d.cost),
-      latency: pick(d.latency),
-      safety: pick(d.safety),
-      reliability: pick(d.reliability),
-      kpi: pick(d.kpi),
-      badcases: pick(d.badcases),
-      dataset: pick(d.dataset),
-    };
+  // ---------------------------------------------------------------------
+  // 当前评估对象（agent under test）—— 头部显示跑的是哪个模型
+  // ---------------------------------------------------------------------
+  function renderAgentInfo() {
+    const info = AGENT_INFO || {};
+
+    // ----- 标题：评估看板 · <被评测 agent 的来源（平台 + agent 名）> -----
+    const h1 = document.getElementById("evalTitle");
+    h1.textContent = "";
+    h1.appendChild(document.createTextNode("评估看板"));
+    const primary = info.primary;
+    if (primary) {
+      h1.appendChild(document.createTextNode(" · "));
+      const tgt = document.createElement("span");
+      tgt.className = "eval-target";
+      tgt.textContent = primary.label;
+      h1.appendChild(tgt);
+      if (primary.platform && primary.platform !== "local" && primary.platform !== "") {
+        const pill = document.createElement("span");
+        pill.className = "plat-tag";
+        pill.textContent = primary.platform;
+        h1.appendChild(pill);
+      }
+      const distinct = info.source_count || 0;
+      if (distinct > 1) {
+        const more = document.createElement("span");
+        more.className = "src-more";
+        more.textContent = `+${distinct - 1} 个其它来源`;
+        more.title = (info.sources || []).map((s) => `${s.label} · ${s.count} 次`).join("\n");
+        h1.appendChild(more);
+      }
+    }
+
+    document.title = primary ? `评估看板 · ${primary.label}` : "评估看板 · 通用 Agent";
+
+    // ----- 副行：默认模型 · 样本数 · 最近时间 -----
+    const el = document.getElementById("agentId");
+    el.innerHTML = "";
+    const seen = info.models_seen || [];
+    const model = info.default_model || seen[0] || "（未配置模型）";
+
+    const label = document.createElement("span");
+    label.className = "ai-label";
+    label.textContent = "当前评估 Agent · 默认模型";
+    el.appendChild(label);
+
+    const modelEl = document.createElement("span");
+    modelEl.className = "ai-model";
+    modelEl.textContent = model;
+    el.appendChild(modelEl);
+
+    // 本批样本里除默认模型外还实际评测过的其它模型（做跨模型对比时才会有）
+    const extras = seen.filter((m) => m && m !== info.default_model);
+    if (extras.length) {
+      const wrap = document.createElement("span");
+      wrap.className = "ai-extra";
+      const t = document.createElement("span");
+      t.className = "ai-label";
+      t.textContent = "本批还评测:";
+      wrap.appendChild(t);
+      extras.forEach((m) => {
+        const chip = document.createElement("span");
+        chip.className = "chip";
+        chip.textContent = m;
+        wrap.appendChild(chip);
+      });
+      el.appendChild(wrap);
+    }
+
+    const n = (typeof info.run_count === "number") ? info.run_count : REAL_RUNS.length;
+    if (n) {
+      const sep = document.createElement("span");
+      sep.className = "ai-sep";
+      sep.textContent = "·";
+      el.appendChild(sep);
+      const meta = document.createElement("span");
+      meta.className = "ai-meta";
+      meta.textContent = `评测样本 ${n} 次调用` + (info.last_run ? ` · 最近 ${fullTime(info.last_run)}` : "");
+      el.appendChild(meta);
+    }
+  }
+
+  // ---------------------------------------------------------------------
+  // 六维 harness 原则达成度 —— 雷达图 + 逐维明细
+  // ---------------------------------------------------------------------
+  const HX_COLORS = ["--series-1", "--series-2", "--series-3", "--series-4", "--series-5", "--series-6"];
+
+  function renderHarness() {
+    const svg = document.getElementById("harnessRadar");
+    const list = document.getElementById("harnessList");
+    const grid = document.getElementById("harnessGrid");
+    const overall = document.getElementById("harnessOverall");
+    const emptyEl = document.getElementById("harnessEmpty");
+    const dims = HARNESS_DIMS;
+
+    if (!dims.length) {
+      grid.style.display = "none";
+      emptyEl.style.display = "block";
+      overall.textContent = "—";
+      return;
+    }
+    grid.style.display = "grid";
+    emptyEl.style.display = "none";
+
+    const totalDone = dims.reduce((a, d) => a + d.done, 0);
+    const totalAll = dims.reduce((a, d) => a + d.total, 0);
+    overall.textContent = `已落实 ${totalDone} / ${totalAll} 项`;
+
+    // ----- radar -----
+    const cx = 170, cy = 150, R = 92, n = dims.length;
+    const ang = (i) => (-90 + (360 / n) * i) * Math.PI / 180;
+    const pt = (i, r) => [cx + r * Math.cos(ang(i)), cy + r * Math.sin(ang(i))];
+    const val = (d) => (d.total ? d.done / d.total : 0);
+
+    let s = "<g>";
+    [0.25, 0.5, 0.75, 1].forEach((rr) => {
+      const pts = dims.map((_, i) => pt(i, R * rr).map((v) => v.toFixed(1)).join(",")).join(" ");
+      s += `<polygon class="r-grid" points="${pts}"></polygon>`;
+    });
+    dims.forEach((_, i) => {
+      const [x, y] = pt(i, R);
+      s += `<line class="r-spoke" x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"></line>`;
+    });
+    const dpts = dims.map((d, i) => pt(i, R * val(d)).map((v) => v.toFixed(1)).join(",")).join(" ");
+    s += `<polygon class="r-area" points="${dpts}"></polygon>`;
+    dims.forEach((d, i) => {
+      const [x, y] = pt(i, R * val(d));
+      s += `<circle class="r-vertex" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="${css(HX_COLORS[i % 6])}"></circle>`;
+    });
+    dims.forEach((d, i) => {
+      const [x, y] = pt(i, R + 18);
+      const a = ang(i);
+      const anchor = Math.cos(a) > 0.3 ? "start" : (Math.cos(a) < -0.3 ? "end" : "middle");
+      const dy = Math.sin(a) > 0.3 ? 9 : (Math.sin(a) < -0.3 ? -3 : 4);
+      s += `<text class="r-axis-name" x="${x.toFixed(1)}" y="${(y + dy).toFixed(1)}" text-anchor="${anchor}">${d.name}</text>`;
+      s += `<text class="r-axis-frac" x="${x.toFixed(1)}" y="${(y + dy + 12).toFixed(1)}" text-anchor="${anchor}">${d.done}/${d.total}</text>`;
+    });
+    s += "</g>";
+    svg.innerHTML = s;
+
+    // ----- breakdown list -----
+    list.style.display = "flex";
+    list.innerHTML = "";
+    dims.forEach((d, i) => {
+      const color = css(HX_COLORS[i % 6]);
+      const pct = d.total ? Math.round((d.done / d.total) * 100) : 0;
+
+      const row = document.createElement("div");
+      row.className = "hx-row";
+      // 逐条明细放到原生 title 里（数据来自受信任的仓库文件，非用户输入）
+      row.title = (d.items || []).map((it) => `${it.done ? "✓" : "○"} ${it.text}`).join("\n");
+
+      const badge = document.createElement("div");
+      badge.className = "hx-badge";
+      badge.style.background = color;
+      badge.textContent = d.id;
+
+      const main = document.createElement("div");
+      main.className = "hx-main";
+      const name = document.createElement("div");
+      name.className = "hx-name";
+      name.textContent = d.name;
+      if (d.en) {
+        const en = document.createElement("span");
+        en.className = "en";
+        en.textContent = d.en;
+        name.appendChild(en);
+      }
+      const def = document.createElement("div");
+      def.className = "hx-def";
+      def.textContent = d.definition || "";
+      const track = document.createElement("div");
+      track.className = "hx-track";
+      const fill = document.createElement("div");
+      fill.className = "hx-fill";
+      fill.style.width = pct + "%";
+      fill.style.background = color;
+      track.appendChild(fill);
+      main.appendChild(name);
+      main.appendChild(def);
+      main.appendChild(track);
+
+      const frac = document.createElement("div");
+      frac.className = "hx-frac";
+      const dn = document.createElement("span");
+      dn.textContent = String(d.done);
+      const sub = document.createElement("span");
+      sub.className = "sub";
+      sub.textContent = "/" + d.total;
+      frac.appendChild(dn);
+      frac.appendChild(sub);
+
+      row.appendChild(badge);
+      row.appendChild(main);
+      row.appendChild(frac);
+      list.appendChild(row);
+    });
   }
 
   // ---------------------------------------------------------------------
   // stat tiles
   // ---------------------------------------------------------------------
   function sparkPath(values, w, h) {
+    if (values.length < 2) {
+      const y = (h / 2).toFixed(1);
+      return { line: `M0,${y} L${w},${y}`, fill: `M0,${y} L${w},${y} L${w},${h} L0,${h} Z` };
+    }
     const min = Math.min(...values), max = Math.max(...values);
     const span = max - min || 1;
     const pts = values.map((v, i) => {
@@ -661,88 +873,81 @@
   }
 
   function renderTiles() {
-    const d = currentData();
     const tilesEl = document.getElementById("tiles");
     tilesEl.innerHTML = "";
 
+    const total = REAL_RUNS.length;
+    const okRuns = REAL_RUNS.filter((r) => !r.error);
+    const successRate = total ? (okRuns.length / total) * 100 : 0;
+    const latencies = runsAsc.map((r) => num(r.latency_seconds)).filter((v) => v !== null);
+    const avgLatency = latencies.length ? latencies.reduce((a, b) => a + b, 0) / latencies.length : null;
+    const p50Latency = median(latencies);
+    const tokenSeries = runsAsc
+      .map((r) => num((r.token_usage || {}).total_tokens))
+      .filter((v) => v !== null);
+    const totalTokens = tokenSeries.reduce((a, b) => a + b, 0);
+
     const specs = [
-      { label: "质量 pass@1", series: d.quality, unit: "%", good: "up" },
-      { label: "可靠性 pass^5", series: d.reliability, unit: "%", good: "up" },
-      { label: "单次成本", series: d.cost, unit: "$", good: "down" },
-      { label: "P50 延迟", series: d.latency, unit: "s", good: "down" },
-      { label: "数据集规模", series: d.dataset, unit: "count", good: "up" },
+      { label: "总调用数", value: String(total), unit: "" },
+      { label: "成功率", value: total ? successRate.toFixed(0) : "—", unit: total ? "%" : "" },
+      { label: "平均延迟", value: avgLatency !== null ? avgLatency.toFixed(1) : "—", unit: avgLatency !== null ? "s" : "", spark: latencies, sparkColor: css("--series-1") },
+      { label: "P50 延迟", value: p50Latency !== null ? p50Latency.toFixed(1) : "—", unit: p50Latency !== null ? "s" : "" },
+      { label: "累计 token", value: tokenSeries.length ? totalTokens.toLocaleString() : "—", unit: "", spark: tokenSeries, sparkColor: css("--series-2") },
     ];
 
     for (const s of specs) {
-      const last = s.series[s.series.length - 1];
-      const prev = s.series.length > 1 ? s.series[s.series.length - 2] : last;
-      const diff = last - prev;
-      const isUp = diff > 0;
-      const deltaGood = s.good === "up" ? isUp : !isUp;
-      const deltaClass = diff === 0 ? "" : deltaGood ? "up" : "down";
-      const deltaText = diff === 0 ? "±0" : (isUp ? "+" : "") + (s.unit === "$" ? diff.toFixed(2) : diff.toFixed(1));
-
       const tile = document.createElement("div");
       tile.className = "tile";
-
-      const valueText = s.unit === "count" ? String(last) : fmt(last, s.unit);
-
       tile.innerHTML = `
         <div class="label">${s.label}</div>
         <div class="value-row">
-          <div class="value">${valueText}</div>
-          ${diff !== 0 ? `<div class="delta ${deltaClass}">${deltaText}</div>` : ""}
+          <div class="value">${s.value}</div>
+          ${s.unit ? `<div class="unit">${s.unit}</div>` : ""}
         </div>
       `;
-
-      const spark = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      spark.setAttribute("class", "spark");
-      spark.setAttribute("viewBox", "0 0 100 26");
-      spark.setAttribute("preserveAspectRatio", "none");
-      const { line, fill } = sparkPath(s.series, 100, 26);
-      const color = deltaGood || diff === 0 ? css("--status-good") : css("--status-critical");
-      spark.innerHTML = `
-        <path class="spark-fill" d="${fill}" fill="${color}"></path>
-        <path class="spark-line" d="${line}" stroke="${color}"></path>
-      `;
-      tile.appendChild(spark);
+      if (s.spark && s.spark.length >= 2) {
+        const spark = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        spark.setAttribute("class", "spark");
+        spark.setAttribute("viewBox", "0 0 100 26");
+        spark.setAttribute("preserveAspectRatio", "none");
+        const { line, fill } = sparkPath(s.spark, 100, 26);
+        spark.innerHTML = `
+          <path class="spark-fill" d="${fill}" fill="${s.sparkColor}"></path>
+          <path class="spark-line" d="${line}" stroke="${s.sparkColor}"></path>
+        `;
+        tile.appendChild(spark);
+      }
       tilesEl.appendChild(tile);
     }
   }
 
   // ---------------------------------------------------------------------
   // generic SVG line/area chart with crosshair + tooltip
+  //   opts: { svgEl, tooltipEl, labels[], series:[{name,unit,color,values,area}],
+  //           yTickFmt }
   // ---------------------------------------------------------------------
   function buildChart(opts) {
-    const { svgEl, tooltipEl, versions, series, indexToBaseline, yTickFmt, skipDirectLabel } = opts;
+    const { svgEl, tooltipEl, labels, series, yTickFmt } = opts;
     const W = svgEl.viewBox.baseVal.width;
     const H = svgEl.viewBox.baseVal.height;
-    const margin = { top: 10, right: 14, bottom: 26, left: 40 };
+    const margin = { top: 12, right: 18, bottom: 26, left: 44 };
     const innerW = W - margin.left - margin.right;
     const innerH = H - margin.top - margin.bottom;
 
-    // compute plotted values (indexed to baseline, or raw)
-    const plotted = series.map((s) => {
-      if (indexToBaseline) {
-        const base = s.values[0];
-        return s.values.map((v) => (v / base) * 100);
-      }
-      return s.values.slice();
-    });
-
+    const plotted = series.map((s) => s.values.slice());
     let yMin = Math.min(...plotted.flat());
     let yMax = Math.max(...plotted.flat());
-    if (indexToBaseline) yMin = Math.min(yMin, 100);
-    const pad = (yMax - yMin) * 0.12 || 5;
-    yMin -= pad;
+    if (!isFinite(yMin) || !isFinite(yMax)) { yMin = 0; yMax = 1; }
+    const pad = (yMax - yMin) * 0.14 || Math.max(yMax * 0.14, 1);
+    yMin = Math.max(0, yMin - pad);
     yMax += pad;
 
-    const xAt = (i) => margin.left + (versions.length === 1 ? innerW / 2 : (i / (versions.length - 1)) * innerW);
+    const n = labels.length;
+    const xAt = (i) => margin.left + (n === 1 ? innerW / 2 : (i / (n - 1)) * innerW);
     const yAt = (v) => margin.top + innerH - ((v - yMin) / (yMax - yMin)) * innerH;
 
     let svg = `<g>`;
 
-    // gridlines (4 horizontal steps) + y ticks
     const steps = 4;
     for (let i = 0; i <= steps; i++) {
       const v = yMin + ((yMax - yMin) * i) / steps;
@@ -751,46 +956,41 @@
       const label = yTickFmt ? yTickFmt(v) : Math.round(v);
       svg += `<text class="axis-label" x="${margin.left - 8}" y="${(y + 3).toFixed(1)}" text-anchor="end">${label}</text>`;
     }
-    if (indexToBaseline) {
-      const y100 = yAt(100);
-      svg += `<line class="baseline-axis" x1="${margin.left}" x2="${W - margin.right}" y1="${y100.toFixed(1)}" y2="${y100.toFixed(1)}"></line>`;
-    }
 
-    // x ticks
-    versions.forEach((v, i) => {
+    // x ticks —— 记录多的时候稀疏显示，避免标签重叠
+    const stride = Math.max(1, Math.ceil(n / 8));
+    labels.forEach((v, i) => {
+      if (i % stride !== 0 && i !== n - 1) return;
       const x = xAt(i);
       svg += `<text class="axis-label" x="${x.toFixed(1)}" y="${H - 6}" text-anchor="middle">${v}</text>`;
     });
 
-    // series lines + areas
     plotted.forEach((vals, si) => {
       const s = series[si];
-      const color = css(s.color.replace("var(", "").replace(")", ""));
+      const color = resolveVar(s.color);
       const linePath = vals.map((v, i) => (i === 0 ? "M" : "L") + xAt(i).toFixed(1) + "," + yAt(v).toFixed(1)).join(" ");
-      if (s.area) {
+      if (s.area && n > 1) {
         const areaPath = linePath + ` L${xAt(vals.length - 1).toFixed(1)},${(margin.top + innerH).toFixed(1)} L${xAt(0).toFixed(1)},${(margin.top + innerH).toFixed(1)} Z`;
         svg += `<path class="series-area" d="${areaPath}" fill="${color}"></path>`;
       }
-      svg += `<path class="series-line" data-series="${si}" d="${linePath}" stroke="${color}"></path>`;
-      // end dot
-      const lastX = xAt(vals.length - 1), lastY = yAt(vals[vals.length - 1]);
-      svg += `<circle class="end-dot" cx="${lastX.toFixed(1)}" cy="${lastY.toFixed(1)}" r="4.5" fill="${color}" stroke="${css('--surface-1')}"></circle>`;
-      if (series.length <= 2 && !skipDirectLabel) {
-        svg += `<text class="direct-label" x="${(lastX + 8).toFixed(1)}" y="${(lastY + 3.5).toFixed(1)}" fill="${color}">${s.name}</text>`;
+      if (n > 1) {
+        svg += `<path class="series-line" data-series="${si}" d="${linePath}" stroke="${color}"></path>`;
       }
+      // 每个数据点画一个小圆点（单点记录时也能看到）
+      vals.forEach((v, i) => {
+        svg += `<circle class="end-dot" cx="${xAt(i).toFixed(1)}" cy="${yAt(v).toFixed(1)}" r="${i === vals.length - 1 ? 4.5 : 2.6}" fill="${color}" stroke="${css('--surface-1')}"></circle>`;
+      });
     });
 
-    // crosshair + hover dots (one per series)
     svg += `<line class="crosshair-line" id="ch-${svgEl.id}" x1="0" x2="0" y1="${margin.top}" y2="${margin.top + innerH}"></line>`;
     plotted.forEach((vals, si) => {
-      svg += `<circle class="hover-dot" id="hd-${svgEl.id}-${si}" r="5" fill="${css(series[si].color.replace('var(','').replace(')',''))}" stroke="${css('--surface-1')}"></circle>`;
+      svg += `<circle class="hover-dot" id="hd-${svgEl.id}-${si}" r="5" fill="${resolveVar(series[si].color)}" stroke="${css('--surface-1')}"></circle>`;
     });
 
-    // invisible hit rects, one per x position, full height
-    versions.forEach((v, i) => {
+    labels.forEach((v, i) => {
       const x0 = i === 0 ? margin.left : (xAt(i - 1) + xAt(i)) / 2;
-      const x1 = i === versions.length - 1 ? W - margin.right : (xAt(i) + xAt(i + 1)) / 2;
-      svg += `<rect x="${x0.toFixed(1)}" y="${margin.top}" width="${(x1 - x0).toFixed(1)}" height="${innerH}" fill="transparent" data-idx="${i}" class="hit"></rect>`;
+      const x1 = i === n - 1 ? W - margin.right : (xAt(i) + xAt(i + 1)) / 2;
+      svg += `<rect x="${x0.toFixed(1)}" y="${margin.top}" width="${Math.max(0, x1 - x0).toFixed(1)}" height="${innerH}" fill="transparent" data-idx="${i}" class="hit"></rect>`;
     });
 
     svg += `</g>`;
@@ -810,24 +1010,23 @@
         dot.style.opacity = 1;
       });
 
-      // tooltip content — textContent only, never innerHTML, for untrusted-label safety
       tooltipEl.innerHTML = "";
       const head = document.createElement("div");
       head.className = "t-head";
-      head.textContent = versions[i];
+      head.textContent = labels[i];
       tooltipEl.appendChild(head);
       series.forEach((s, si) => {
         const row = document.createElement("div");
         row.className = "t-row";
         const key = document.createElement("span");
         key.className = "t-key";
-        key.style.background = css(s.color.replace("var(", "").replace(")", ""));
+        key.style.background = resolveVar(s.color);
         const name = document.createElement("span");
         name.className = "t-name";
         name.textContent = s.name;
         const val = document.createElement("span");
         val.className = "t-val";
-        val.textContent = fmt(s.values[i], s.unit);
+        val.textContent = (s.fmt ? s.fmt(s.values[i]) : String(s.values[i]));
         row.appendChild(key);
         row.appendChild(name);
         row.appendChild(val);
@@ -840,126 +1039,153 @@
       tooltipEl.style.top = "6px";
       tooltipEl.style.opacity = 1;
     }
-
     function hide() {
       crosshair.style.opacity = 0;
-      plotted.forEach((_, si) => {
-        svgEl.querySelector(`#hd-${svgEl.id}-${si}`).style.opacity = 0;
-      });
+      plotted.forEach((_, si) => { svgEl.querySelector(`#hd-${svgEl.id}-${si}`).style.opacity = 0; });
       tooltipEl.style.opacity = 0;
     }
-
     hits.forEach((hit) => {
       const idx = +hit.getAttribute("data-idx");
       hit.addEventListener("pointerenter", () => showAt(idx));
       hit.addEventListener("pointermove", () => showAt(idx));
-      hit.addEventListener("focus", () => showAt(idx));
     });
     svgEl.addEventListener("pointerleave", hide);
-    svgEl.addEventListener("blur", hide, true);
   }
 
-  // 六维小图矩阵——每个维度自己的量纲、自己的坐标轴，不做归一化叠加，
-  // 避免像"安全"这种窄幅波动的指标被"可靠性"这种大幅波动的指标
-  // 压扁到视觉上看不见。
-  function ensureDimGridBuilt() {
-    const grid = document.getElementById("dimGrid");
-    if (grid.children.length) return; // 只建一次 DOM 结构，之后复用
-    DIMENSIONS.forEach((dim) => {
-      const cell = document.createElement("div");
-      cell.className = "dim-cell";
-      cell.innerHTML = `
-        <div class="dim-head">
-          <span class="dim-name"></span>
-          <span><span class="dim-value"></span><span class="dim-delta"></span></span>
-        </div>
-        <div class="chart-wrap">
-          <svg class="chart" id="dimChart-${dim.key}" viewBox="0 0 340 150"></svg>
-          <div class="tooltip" id="dimTooltip-${dim.key}"></div>
-        </div>
-      `;
-      cell.querySelector(".dim-name").textContent = dim.name;
-      cell.dataset.key = dim.key;
-      grid.appendChild(cell);
-    });
-  }
-
-  function renderDimGrid() {
-    ensureDimGridBuilt();
-    const d = currentData();
-    DIMENSIONS.forEach((dim) => {
-      const values = d[dim.key];
-      const cell = document.querySelector(`.dim-cell[data-key="${dim.key}"]`);
-      const last = values[values.length - 1];
-      const prev = values.length > 1 ? values[values.length - 2] : last;
-      const diff = last - prev;
-      const isUp = diff > 0;
-      const deltaGood = dim.lowerIsBetter ? !isUp : isUp;
-
-      cell.querySelector(".dim-value").textContent = fmt(last, dim.unit);
-      const deltaEl = cell.querySelector(".dim-delta");
-      if (diff === 0) {
-        deltaEl.textContent = "";
-      } else {
-        deltaEl.className = "dim-delta " + (deltaGood ? "up" : "down");
-        deltaEl.textContent = " " + (isUp ? "+" : "") + (dim.unit === "$" ? diff.toFixed(2) : diff.toFixed(1)) + (dim.unit === "%" ? "pp" : "");
-      }
-
-      buildChart({
-        svgEl: document.getElementById(`dimChart-${dim.key}`),
-        tooltipEl: document.getElementById(`dimTooltip-${dim.key}`),
-        versions: d.versions,
-        series: [{ name: dim.name, unit: dim.unit, color: dim.color, values, area: true }],
-        indexToBaseline: false,
-        yTickFmt: (v) => (dim.unit === "$" ? v.toFixed(2) : Math.round(v)),
-        skipDirectLabel: true, // 名字已经在卡片头部显示了，图里不用再重复一遍，小图也放不下
-      });
-    });
-  }
-
-  function renderSideCharts() {
-    const d = currentData();
+  function renderLatencyChart() {
+    const svgEl = document.getElementById("latencyChart");
+    const emptyEl = document.getElementById("latencyEmpty");
+    const points = runsAsc
+      .map((r) => ({ t: shortTime(r.timestamp), v: num(r.latency_seconds) }))
+      .filter((p) => p.v !== null);
+    if (!points.length) {
+      svgEl.style.display = "none"; emptyEl.style.display = "block"; return;
+    }
+    svgEl.style.display = "block"; emptyEl.style.display = "none";
     buildChart({
-      svgEl: document.getElementById("badcaseChart"),
-      tooltipEl: document.getElementById("badcaseTooltip"),
-      versions: d.versions,
-      series: [{ name: "bad case 数量", unit: "count", color: "var(--series-1)", values: d.badcases, area: true }],
-      indexToBaseline: false,
-      yTickFmt: (v) => Math.round(v),
-    });
-    buildChart({
-      svgEl: document.getElementById("datasetChart"),
-      tooltipEl: document.getElementById("datasetTooltip"),
-      versions: d.versions,
-      series: [{ name: "数据集条数", unit: "count", color: "var(--series-1)", values: d.dataset, area: true }],
-      indexToBaseline: false,
-      yTickFmt: (v) => Math.round(v),
+      svgEl,
+      tooltipEl: document.getElementById("latencyTooltip"),
+      labels: points.map((p) => p.t),
+      series: [{ name: "耗时", color: "var(--series-1)", values: points.map((p) => p.v), area: true, fmt: (v) => v.toFixed(1) + "s" }],
+      yTickFmt: (v) => v.toFixed(1) + "s",
     });
   }
 
-  function renderAll() {
-    renderTiles();
-    renderDimGrid();
-    renderSideCharts();
+  function renderTokenChart() {
+    const svgEl = document.getElementById("tokenChart");
+    const emptyEl = document.getElementById("tokenEmpty");
+    const points = runsAsc
+      .map((r) => ({ t: shortTime(r.timestamp), v: num((r.token_usage || {}).total_tokens) }))
+      .filter((p) => p.v !== null);
+    if (!points.length) {
+      svgEl.style.display = "none"; emptyEl.style.display = "block"; return;
+    }
+    svgEl.style.display = "block"; emptyEl.style.display = "none";
+    buildChart({
+      svgEl,
+      tooltipEl: document.getElementById("tokenTooltip"),
+      labels: points.map((p) => p.t),
+      series: [{ name: "总 token", color: "var(--series-2)", values: points.map((p) => p.v), area: true, fmt: (v) => v.toLocaleString() }],
+      yTickFmt: (v) => Math.round(v).toLocaleString(),
+    });
   }
 
   // ---------------------------------------------------------------------
-  // 真实运行记录表格 —— 数据来自 REAL_RUNS（build.py 注入），全部用
-  // textContent 插入 DOM，因为这些是真实用户输入/模型输出，不是可信内容。
+  // status donut
+  // ---------------------------------------------------------------------
+  function renderStatusDonut() {
+    const total = REAL_RUNS.length;
+    const ok = REAL_RUNS.filter((r) => !r.error).length;
+    const err = total - ok;
+    const pct = total ? (ok / total) * 100 : 0;
+
+    const svg = document.getElementById("statusDonut");
+    const R = 15.915; // circumference = 100
+    const okColor = css("--status-good");
+    const errColor = css("--status-critical");
+    const okLen = total ? (ok / total) * 100 : 0;
+
+    svg.innerHTML = `
+      <circle cx="21" cy="21" r="${R}" fill="none" stroke="${css('--surface-2')}" stroke-width="5"></circle>
+      ${ok ? `<circle cx="21" cy="21" r="${R}" fill="none" stroke="${okColor}" stroke-width="5"
+                stroke-dasharray="${okLen.toFixed(2)} ${(100 - okLen).toFixed(2)}" stroke-dashoffset="0"></circle>` : ""}
+      ${err ? `<circle cx="21" cy="21" r="${R}" fill="none" stroke="${errColor}" stroke-width="5"
+                stroke-dasharray="${(100 - okLen).toFixed(2)} ${okLen.toFixed(2)}" stroke-dashoffset="${(-okLen).toFixed(2)}"></circle>` : ""}
+    `;
+    document.getElementById("statusPct").textContent = total ? pct.toFixed(0) + "%" : "—";
+
+    const legend = document.getElementById("statusLegend");
+    legend.innerHTML = "";
+    [["成功", ok, okColor], ["出错", err, errColor]].forEach(([name, val, color]) => {
+      const item = document.createElement("div");
+      item.className = "item";
+      const sw = document.createElement("span"); sw.className = "sw"; sw.style.background = color;
+      const nm = document.createElement("span"); nm.className = "lg-name"; nm.textContent = name;
+      const vl = document.createElement("span"); vl.className = "lg-val"; vl.textContent = String(val);
+      item.appendChild(sw); item.appendChild(nm); item.appendChild(vl);
+      legend.appendChild(item);
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // horizontal bar lists (tools, sources)
+  // ---------------------------------------------------------------------
+  function renderBars(containerId, counts, color, emptyText) {
+    const el = document.getElementById(containerId);
+    el.innerHTML = "";
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    if (!entries.length) {
+      const p = document.createElement("div");
+      p.className = "chart-empty";
+      p.textContent = emptyText;
+      el.appendChild(p);
+      return;
+    }
+    const max = Math.max(...entries.map(([, v]) => v));
+    for (const [label, val] of entries) {
+      const row = document.createElement("div");
+      row.className = "bar-row";
+      const lab = document.createElement("div");
+      lab.className = "bar-label"; lab.textContent = label; lab.title = label;
+      const track = document.createElement("div");
+      track.className = "bar-track";
+      const fill = document.createElement("div");
+      fill.className = "bar-fill";
+      fill.style.width = (max ? (val / max) * 100 : 0) + "%";
+      fill.style.background = resolveVar(color);
+      track.appendChild(fill);
+      const v = document.createElement("div");
+      v.className = "bar-val"; v.textContent = String(val);
+      row.appendChild(lab); row.appendChild(track); row.appendChild(v);
+      el.appendChild(row);
+    }
+  }
+
+  function renderToolBars() {
+    const counts = {};
+    for (const r of REAL_RUNS) {
+      const tools = r.tools_used || [];
+      if (!tools.length) { counts["（无工具）"] = (counts["（无工具）"] || 0) + 1; continue; }
+      for (const t of tools) counts[t] = (counts[t] || 0) + 1;
+    }
+    renderBars("toolBars", counts, "var(--series-5)", "还没有运行记录");
+  }
+
+  function renderSourceBars() {
+    const counts = {};
+    for (const r of REAL_RUNS) {
+      const s = sourceLabel(r.source);
+      counts[s] = (counts[s] || 0) + 1;
+    }
+    renderBars("sourceBars", counts, "var(--series-3)", "还没有运行记录");
+  }
+
+  // ---------------------------------------------------------------------
+  // real run log table
   // ---------------------------------------------------------------------
   function truncate(s, n) {
     if (!s) return "";
     return s.length > n ? s.slice(0, n).trim() + "…" : s;
-  }
-
-  function formatTime(iso) {
-    try {
-      const d = new Date(iso);
-      const pad = (n) => String(n).padStart(2, "0");
-      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-    } catch {
-      return iso || "—";
-    }
   }
 
   function renderRealRuns() {
@@ -967,20 +1193,16 @@
     const empty = document.getElementById("runTableEmpty");
     tbody.innerHTML = "";
 
-    if (!REAL_RUNS.length) {
-      empty.style.display = "block";
-      return;
-    }
+    if (!REAL_RUNS.length) { empty.style.display = "block"; return; }
     empty.style.display = "none";
 
     const sorted = REAL_RUNS.slice().sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""));
-
     for (const run of sorted) {
       const tr = document.createElement("tr");
 
       const tdTime = document.createElement("td");
       tdTime.className = "col-time";
-      tdTime.textContent = formatTime(run.timestamp);
+      tdTime.textContent = fullTime(run.timestamp);
       tr.appendChild(tdTime);
 
       const tdStatus = document.createElement("td");
@@ -997,7 +1219,7 @@
 
       const tdSource = document.createElement("td");
       tdSource.className = "col-model";
-      tdSource.textContent = run.source || "本地直接调用";
+      tdSource.textContent = sourceLabel(run.source);
       tr.appendChild(tdSource);
 
       const tdInput = document.createElement("td");
@@ -1018,14 +1240,12 @@
       const tools = run.tools_used || [];
       if (tools.length === 0) {
         const chip = document.createElement("span");
-        chip.className = "chip";
-        chip.textContent = "无";
+        chip.className = "chip"; chip.textContent = "无";
         chipRow.appendChild(chip);
       } else {
         tools.forEach((t) => {
           const chip = document.createElement("span");
-          chip.className = "chip";
-          chip.textContent = t;
+          chip.className = "chip"; chip.textContent = t;
           chipRow.appendChild(chip);
         });
       }
@@ -1056,25 +1276,24 @@
     }
   }
 
-  document.querySelectorAll("#splitSeg button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("#splitSeg button").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      state.split = btn.dataset.split;
-      renderAll();
-    });
-  });
-  document.querySelectorAll("#rangeSeg button").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      document.querySelectorAll("#rangeSeg button").forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      state.range = btn.dataset.range;
-      renderAll();
-    });
-  });
+  function renderAll() {
+    renderAgentInfo();
+    renderTiles();
+    renderHarness();
+    renderLatencyChart();
+    renderTokenChart();
+    renderStatusDonut();
+    renderToolBars();
+    renderSourceBars();
+    renderRealRuns();
+    document.getElementById("buildTag").textContent = `live · ${REAL_RUNS.length} runs`;
+  }
 
   renderAll();
-  renderRealRuns();
-  window.addEventListener("resize", renderAll);
+  window.addEventListener("resize", () => {
+    // 只有依赖像素宽度的折线图需要重算 tooltip 定位，重绘一遍即可
+    renderLatencyChart();
+    renderTokenChart();
+  });
 })();
 </script>

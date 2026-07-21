@@ -6,7 +6,7 @@
 ## 安装（软链，已完成）
 
 ```bash
-ln -s "/Users/jodykwong/documents/Claude Code/test/openclaw-skill" \
+ln -s "/Users/jodykwong/Documents/Claude Code/test/openclaw-skill" \
       ~/.openclaw/skills/our-general-agent
 ```
 
@@ -20,7 +20,7 @@ ln -s "/Users/jodykwong/documents/Claude Code/test/openclaw-skill" \
 先手动跑一遍，确认脚本本身没问题（这一步不依赖 OpenClaw）：
 
 ```bash
-"/Users/jodykwong/documents/Claude Code/test/openclaw-skill/scripts/run.sh" "帮我算一下 12*8 是多少"
+"/Users/jodykwong/Documents/Claude Code/test/openclaw-skill/scripts/run.sh" "帮我算一下 12*8 是多少"
 ```
 
 正常应该会调用代码执行工具，最后输出一句包含 96 的回答。

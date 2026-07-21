@@ -33,16 +33,20 @@ MEMORY_DB_PATH = Path(__file__).resolve().parent.parent / "eval" / "runner" / "c
 # 多厂商环境下每家 SDK 抛的异常类型都不一样（openai 的 RateLimitError、
 # requests 的 ReadTimeout、httpx 的 ConnectError……），与其挨个 import
 # 每家的异常类型，不如直接从错误信息里找关键词，简单但覆盖面更广。
-_TRANSIENT_ERROR_MARKERS = (
-    "429", "500", "502", "503", "504",
-    "timeout", "timed out", "rate_limit", "rate limit",
+# 纯文本关键词用子串匹配即可；HTTP 状态码单独用词边界匹配，避免裸子串
+# "500" 命中 "1500"/"15000ms" 这类无关数字导致误判为瞬时故障。
+_TRANSIENT_TEXT_MARKERS = (
+    "timeout", "timed out", "rate_limit", "rate limit", "too many requests",
     "connection", "temporarily unavailable", "overloaded",
 )
+_TRANSIENT_STATUS_RE = re.compile(r"\b(?:429|500|502|503|504)\b")
 
 
 def _is_transient_error(exc: Exception) -> bool:
     text = f"{type(exc).__name__}: {exc}".lower()
-    return any(marker in text for marker in _TRANSIENT_ERROR_MARKERS)
+    if any(marker in text for marker in _TRANSIENT_TEXT_MARKERS):
+        return True
+    return bool(_TRANSIENT_STATUS_RE.search(text))
 
 
 def resolve_source(caller_cwd: str | None) -> str:
@@ -71,12 +75,33 @@ def resolve_source(caller_cwd: str | None) -> str:
 _THINK_TAG_RE = re.compile(r"<think>.*?</think>", re.DOTALL)
 
 
-def _strip_thinking(text: str) -> str:
+def _normalize_content(content: Any) -> str:
+    """把不同 provider 的 message.content 归一化成纯文本字符串。
+
+    OpenAI / MiniMax 返回的是 str；但 Anthropic 等在带 thinking / tool_use
+    块时，content 是内容块列表（list[dict]），直接对 list 做正则会抛
+    TypeError。项目的卖点就是"改一个配置字符串就能换厂商"，所以这里必须
+    兼容 list 形态，把其中的文本块拼起来，保证换到 Anthropic 时最终答案
+    提取不会崩。"""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, str):
+                parts.append(block)
+            elif isinstance(block, dict) and block.get("type") == "text":
+                parts.append(block.get("text", ""))
+        return "".join(parts)
+    return str(content) if content is not None else ""
+
+
+def _strip_thinking(text: Any) -> str:
     """有些模型（比如 MiniMax-M3、DeepSeek 系列）把推理过程内联在 <think>
     标签里，而不是走独立的结构化 thinking 字段。这里把这部分从最终展示
     给用户的回答里去掉，只保留真正的答案；完整内容（含 think 标签）
     还是原样保留在 messages/trace 里，方便调试。"""
-    return _THINK_TAG_RE.sub("", text).strip()
+    return _THINK_TAG_RE.sub("", _normalize_content(text)).strip()
 
 
 @dataclass
@@ -134,8 +159,40 @@ def _persist_result(result: AgentResult) -> None:
                 ensure_ascii=False,
                 indent=2,
             )
-    except OSError as e:
+    except Exception as e:
+        # 落盘失败绝不能影响本次调用结果。这里兜底 Exception 而不只是 OSError：
+        # json.dump 遇到不可序列化的 message content / tool_calls 会抛 TypeError，
+        # 而 _persist_result 是在 run_agent 的 finally 里调的——如果这个 TypeError
+        # 逃出去，在错误路径上会顶替掉正在向上传播的真实异常，让调用方看到
+        # 一个跟根因无关的报错。所以这里全部吞掉、只打日志。
         print(f"[warn] trace 落盘失败（不影响本次调用结果）：{e}")
+
+
+def _next_invoke_input(agent, config: dict, user_input: str) -> dict:
+    """决定这一次 invoke 往图里塞什么消息，避免重试时把用户输入重复追加到
+    带记忆的 checkpointer 线程上。
+
+    带 checkpointer 时 LangGraph 会逐步把图状态落盘：如果上一次 invoke 在
+    "用户消息已写入、但模型那步失败"的位置抛错，这条用户消息其实已经留在
+    thread 里了。此时若重试再传一遍 user_input，同一条用户消息就会在线程里
+    出现两次，污染后续调用读到的对话历史。
+
+    这里先看线程当前状态的最后一条消息：如果它正好是我们要发的这条用户
+    消息（说明上次失败前已写入），就传空 messages 让图基于已有状态继续
+    （resume），不重复追加；否则正常把用户消息塞进去。首次调用、以及上次
+    在写入用户消息之前就失败的情况，都会落到"正常塞入"这一支，不会漏掉输入。"""
+    try:
+        snapshot = agent.get_state(config)
+        existing = list(snapshot.values.get("messages", [])) if snapshot else []
+    except Exception:
+        # 拿不到状态（比如没挂 checkpointer）时，退化成一律塞入用户消息，
+        # 这也是无记忆场景下本来就正确的行为。
+        existing = []
+    if existing:
+        last = existing[-1]
+        if getattr(last, "type", "") == "human" and getattr(last, "content", None) == user_input:
+            return {"messages": []}
+    return {"messages": [{"role": "user", "content": user_input}]}
 
 
 def run_agent(
@@ -162,11 +219,12 @@ def run_agent(
                     在 cd 到本项目之前的原始工作目录，用来反推是本地直接
                     调用还是哪个 OpenClaw agent 触发的（见 resolve_source）。
                     不传的话会尝试读 CALLER_CWD 环境变量。
-        session_id: 可选，跨调用的对话记忆用哪个 thread_id 延续。不传的话
-                    默认用调用来源（source）当 thread_id——同一个 OpenClaw
-                    agent 的连续调用会自动记得之前说过什么；同一个来源
-                    下如果需要开一个全新的、不带历史的对话，显式传一个
-                    新的 session_id 即可。
+        session_id: 可选，跨调用的对话记忆用哪个 thread_id 延续。
+                    不传时：认得出的 OpenClaw 来源用 source 当 thread_id，
+                    同一个 agent 的连续调用会自动记得之前说过什么；认不出的
+                    "本地直接调用"则每次用独立线程（不串记忆），避免所有匿名
+                    本地调用挤进同一条无限增长的记忆线程。需要在本地也延续
+                    记忆、或在某个来源下开一个全新对话时，显式传 session_id 即可。
         max_retries: 遇到看起来像瞬时故障（网络超时、429、5xx）时的
                      重试次数，指数退避。不是瞬时故障（比如鉴权失败）
                      不会重试，直接抛出。
@@ -180,7 +238,20 @@ def run_agent(
     timestamp = datetime.now(timezone.utc).isoformat()
     resolved_model = model or "default"
     source = resolve_source(caller_cwd or os.environ.get("CALLER_CWD"))
-    thread_id = session_id or source
+    # 记忆线程的选取：
+    #   - 显式传了 session_id：完全听调用方的。
+    #   - 认得出的 OpenClaw 来源：用 source 当 thread_id，让同一个 agent 的
+    #     连续调用自然延续上下文。
+    #   - 认不出的"本地直接调用"：每次用独立线程。否则所有匿名本地调用
+    #     （smoke_test、随手试的无关问题……）会挤进同一条永远增长、还会
+    #     互相串味的记忆线程，长对话又没有裁剪，早晚撑爆上下文。需要本地
+    #     也延续记忆时，显式传 session_id 即可。
+    if session_id:
+        thread_id = session_id
+    elif source == "本地直接调用":
+        thread_id = f"local:{trial_id}"
+    else:
+        thread_id = source
 
     MEMORY_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
@@ -199,7 +270,7 @@ def run_agent(
             while True:
                 try:
                     result = agent.invoke(
-                        {"messages": [{"role": "user", "content": user_input}]},
+                        _next_invoke_input(agent, invoke_config, user_input),
                         config=invoke_config,
                     )
                     break

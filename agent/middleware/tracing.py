@@ -50,8 +50,13 @@ class TracingMiddleware(AgentMiddleware):
             self.total_input_tokens += input_tokens
         if isinstance(output_tokens, int):
             self.total_output_tokens += output_tokens
-        if isinstance(usage.get("total_tokens"), int):
-            self.total_tokens += usage["total_tokens"]
+        total_tokens = usage.get("total_tokens")
+        if isinstance(total_tokens, int):
+            self.total_tokens += total_tokens
+        elif isinstance(input_tokens, int) or isinstance(output_tokens, int):
+            # provider 只给了分项、没给合计时，用分项兜底，避免看板出现
+            # "输入/输出非零、合计为零"的矛盾数字。
+            self.total_tokens += (input_tokens or 0) + (output_tokens or 0)
 
         self.events.append(
             {
